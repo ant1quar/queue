@@ -1,12 +1,16 @@
 {
-    "name": "workspace",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "type": "module",
-    "scripts": {
-        "start": "node index.js"
-      },
-    "author": "",
-    "license": "ISC"
+  "name": "queue",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun run index.ts",
+    "typecheck": "bun run tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
 }
