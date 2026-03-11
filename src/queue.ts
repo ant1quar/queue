@@ -1,6 +1,4 @@
-export type QueueMessage = unknown;
-
-export type QueueCallback = (message: QueueMessage) => Promise<void>;
+import type { QueueCallback, QueueMessage } from "./declarations/types";
 
 export class Queue {
   private _name: string;
@@ -8,7 +6,6 @@ export class Queue {
   private _maxTasks: number;
   private _activeTasks = 0;
   private _tasks: QueueMessage[] = [];
-  private itWorks = false;
 
   constructor(name: string, callback: QueueCallback, maxTasks = 1) {
     this._name = name;
@@ -16,27 +13,21 @@ export class Queue {
     this._maxTasks = maxTasks;
   }
 
-  get name() {
-    return this._name;
-  }
-
-  private _canWork() {
-    return !this.itWorks || this._activeTasks < this._maxTasks;
+  private _hasCapacity() {
+    return this._activeTasks < this._maxTasks;
   }
 
   addTask(task: QueueMessage) {
     this._tasks.push(task);
-    if (this._canWork()) {
+    if (this._hasCapacity()) {
       this.crawl();
     }
   }
 
   private crawl() {
     if (this._tasks.length > 0) {
-      this.itWorks = true;
       this._activeTasks++;
       this._callback(this._tasks.shift()!).finally(() => {
-        this.itWorks = false;
         this._activeTasks--;
         this.crawl();
       });
