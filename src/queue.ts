@@ -1,9 +1,10 @@
 import { isNil } from "./declarations/typeguards/isNil";
 import { isQueueState } from "./declarations/typeguards/isQueueState";
 import type { QueueCallback, QueueMessage, QueueState } from "./declarations/types";
+import { Persistable } from "./persistable";
 import { FileStorage, getStorage } from "./storage";
 
-export class Queue {
+export class Queue extends Persistable {
   private _name: string;
   private _callback: QueueCallback;
   private _maxTasks: number;
@@ -12,6 +13,7 @@ export class Queue {
   private _storage: FileStorage = getStorage();
 
   constructor(name: string, callback: QueueCallback, maxTasks = 1) {
+    super();
     this._name = name;
     this._callback = callback;
     this._maxTasks = maxTasks;
@@ -88,5 +90,9 @@ export class Queue {
       return data;
     }
     throw new Error(`Invalid stored tasks: ${JSON.stringify(data)}`);
+  }
+
+  protected async persist(): Promise<void> {
+    await this.storeQueue();
   }
 }
