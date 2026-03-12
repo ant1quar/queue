@@ -10,14 +10,20 @@ export class Queue extends Persistable {
   private _maxTasks: number;
   private _activeTasks = 0;
   private _tasks: QueueMessage[] = [];
-  private _storage: FileStorage = getStorage();
+  private _storage: FileStorage;
+  private _readyPromise: Promise<void>;
 
-  constructor(name: string, callback: QueueCallback, maxTasks = 1) {
+  constructor(name: string, callback: QueueCallback, maxTasks = 1, storage?: FileStorage) {
     super();
     this._name = name;
     this._callback = callback;
     this._maxTasks = maxTasks;
-    this.init();
+    this._storage = storage ?? getStorage();
+    this._readyPromise = this.init();
+  }
+
+  ready(): Promise<void> {
+    return this._readyPromise;
   }
 
 
@@ -32,11 +38,13 @@ export class Queue extends Persistable {
   private crawl() {
     if (this._tasks.length > 0) {
       this._activeTasks++;
-      this._callback(this._tasks.shift()!).finally(() => {
-        this.storeQueue();
-        this._activeTasks--;
-        this.crawl();
-      });
+      this._callback(this._tasks.shift()!)
+        .catch((err) => console.error(`Error in queue callback: ${err}`))
+        .finally(() => {
+          this.storeQueue();
+          this._activeTasks--;
+          this.crawl();
+        });
     }
   }
 

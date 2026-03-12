@@ -6,7 +6,7 @@ export class FileStorage {
 
     async read(path: string): Promise<Record<string, unknown> | null> {
         const file = Bun.file(path);
-        if (!file.exists()) {
+        if (!(await file.exists())) {
             return null;
         }
         return await file.json();

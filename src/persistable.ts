@@ -1,6 +1,9 @@
+import { isNil } from "./declarations/typeguards/isNil";
+
 export abstract class Persistable {
     private static instances = new Set<Persistable>();
     private static shutdownRegistered = false;
+    private static onComplete?: () => void;
 
     constructor() {
       Persistable.instances.add(this);
@@ -15,11 +18,17 @@ export abstract class Persistable {
         await Promise.all(
           [...Persistable.instances].map((p) => p.persist())
         );
-        process.exit(0);
+        if(!isNil(Persistable.onComplete) || typeof Persistable.onComplete === 'function') {
+            Persistable.onComplete();
+        }
       };
       process.on("SIGINT", shutdown);
       process.on("SIGTERM", shutdown);
     }
 
+    static setShutdownComplete(cb: () => void): void {
+        Persistable.onComplete = cb;
+      }
+    
     protected abstract persist(): Promise<void>;
   }

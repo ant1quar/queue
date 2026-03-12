@@ -1,8 +1,11 @@
 import type { QueueCallback, QueueMessage } from "./declarations/types";
+import { Persistable } from "./persistable";
 
 import { Queue } from "./queue.ts";
 
 const MESSAGES_LENGTH = 30;
+
+Persistable.setShutdownComplete(() => process.exit(0));
 
 const callback: QueueCallback = async (message: QueueMessage) => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
