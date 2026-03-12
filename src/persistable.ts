@@ -1,5 +1,8 @@
 import { isNil } from "./declarations/typeguards/isNil";
-
+//Класс который изолирует логику которую нужно выполнить в момент получения сигналов SIGINT или SIGTERM
+//Singleton-like. static параметры для того, чтобы зарегистрировать один обработчик сигналов но выполнить persist для всех экземпляров
+//onComplete добавил для тестов. ну и в целом чтобы логику завершения работы приложения можно было переопределить.
+//можно еще добавить тайпгарду для функции, не принципиально.
 export abstract class Persistable {
     private static instances = new Set<Persistable>();
     private static shutdownRegistered = false;

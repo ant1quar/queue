@@ -3,7 +3,13 @@ import { isQueueState } from "./declarations/typeguards/isQueueState";
 import type { QueueCallback, QueueMessage, QueueState } from "./declarations/types";
 import { Persistable } from "./persistable";
 import { FileStorage, getStorage } from "./storage";
-
+//Класс который реализует очередь задач.
+// Persistable нужен для реакции на сигналы завершения работы - записи очереди в файл.
+// В тз "состояние очереди должно быть записано в файл". Не совсем понятно что такое состояние - сейчас я сохраняю все задачи, activeTasks и maxTasks.
+// Но на момент следующего вызова maxTasks может быть изменен. Поэтому я не использую их после инициализации.
+//ready - для того, чтобы можно было дождаться инициализации очереди перед тестами.
+//Идея для доработки - добавить состояние задачам pending, processing. - так будет понятно над какими задачами работает очередь в момент записи в файл.
+//Да, JSON.stringify потеряетфункции, если таском будет объект с методами. Но по тз пока не важен тип. можем доработать позже.
 export class Queue extends Persistable {
   private _name: string;
   private _callback: QueueCallback;
